@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="AutoFFS: Adversarial Deformations for Facial Feminization Surgery Planning">
+    <meta name="keywords"
+          content="Facial Feminization Surgery, Counterfactual Shape Editing, Adversarial Deformations, Free-Form Deformation, Medical Image Analysis">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>AutoFFS: Adversarial Deformations for Facial Feminization Surgery Planning</title>
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+    <link rel="stylesheet" href="./static/css/juxtapose.css">
+    <link rel="stylesheet" href="./static/css/bulma.min.css">
+    <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="./static/css/index.css">
+    <link rel="stylesheet" href="./static/css/mousehover.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer src="./static/js/fontawesome.all.min.js"></script>
+    <script src="./static/js/bulma-carousel.min.js"></script>
+    <script src="./static/js/bulma-slider.min.js"></script>
+    <script src="./static/js/index.js"></script>
+    <script src="./static/js/juxtapose.js"></script>
+
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+            options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+    <div class="navbar-menu">
+        <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+            <a class="navbar-item" href="https://pfriedri.github.io">
+                <span class="icon"><i class="fas fa-home"></i></span>
+            </a>
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">More Research</a>
+                <div class="navbar-dropdown">
+                    <a class="navbar-item" href="https://pfriedri.github.io/medfuncta-io/">
+                        MedFuncta: A Unified Framework for Learning Efficient Medical Neural Fields
+                    </a>
+                    <a class="navbar-item" href="https://pfriedri.github.io/wdm-3d-io/">
+                        WDM: 3D Wavelet Diffusion Models for High-Resolution Medical Image Synthesis
+                    </a>
+                    <a class="navbar-item" href="https://pfriedri.github.io/pcdiff-implant-io/">
+                        Point Cloud Diffusion Models for Automatic Implant Generation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-body" style="padding-bottom: 1rem;">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered">
+                <div class="column has-text-centered">
+                    <h1 class="title is-1 publication-title">AutoFFS: Adversarial Deformations for Facial Feminization Surgery Planning</h1>
+                    <h4 class="title is-4">arXiv Preprint</h4>
+                    <div class="is-size-5 publication-authors">
+                        <span class="author-block">
+                            <a href="https://pfriedri.github.io">Paul Friedrich</a><sup><small>1</small></sup>,
+                        </span>
+                        <span class="author-block">
+                            <a href="https://dbe.unibas.ch/en/persons/florentin-bieder/">Florentin Bieder</a><sup><small>1</small></sup>,
+                        </span>
+                        <span class="author-block">
+                            <a href="https://dbe.unibas.ch/en/research/regenerative-surgery/swiss-mam-medical-additive-manufacturing-research-group/group-members/florian-m-thieringer/">Florian M. Thieringer</a><sup><small>1,2</small></sup>,
+                        </span>
+                        <span class="author-block">
+                            <a href="https://dbe.unibas.ch/en/persons/philippe-claude-cattin/">Philippe C. Cattin</a><sup><small>1</small></sup>
+                        </span>
+                    </div>
+
+                    <div class="is-size-5 publication-authors">
+                        <span class="author-block"><sup><small>1</small></sup>University of Basel</span>
+                        <span class="author-block"><sup><small>2</small></sup>University Hospital Basel</span>
+                    </div>
+
+                    <div class="column has-text-centered">
+                        <div class="publication-links">
+                            <span class="link-block">
+                                <a href="https://arxiv.org/abs/2603.02288"
+                                   class="external-link button is-normal is-rounded is-dark">
+                                    <span class="icon"><i class="ai ai-arxiv"></i></span>
+                                    <span>arXiv</span>
+                                </a>
+                            </span>
+                            <span class="link-block">
+                                <a href="https://github.com/pfriedri/autoffs"
+                                   class="external-link button is-normal is-rounded is-dark">
+                                    <span class="icon"><i class="fab fa-github"></i></span>
+                                    <span>Code</span>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Eyecatcher -->
+<section class="eyecatcher" style="padding-top: 0;">
+    <div class="container is-max-desktop">
+        <div class="hero-body">
+            <div class="has-text-centered">
+                <img src="./static/images/Overview.png" width="100%" style="image-rendering: auto;">
+            </div>
+            <h2 class="subtitle has-text-justified" style="margin-top: 1rem;">
+                We perform a <i>deformation-based targeted adversarial attack</i> on an ensemble of pre-trained
+                binary sex classifiers by optimizing the deformation field given the target class label
+                \(y_{\text{target}}\), effectively transforming individual skull shapes toward the target sex.
+            </h2>
+        </div>
+    </div>
+</section>
+
+<!-- Abstract -->
+<section class="section" style="background-color:#f5f5f5">
+    <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+            <div class="column is-four-fifths">
+                <h2 class="title is-3">Abstract</h2>
+                <div class="content has-text-justified">
+                    <p>
+                        Facial feminization surgery (FFS) is a key component of gender affirmation for transgender
+                        and gender diverse patients, aiming to reshape craniofacial structures toward a female morphology.
+                        Current surgical planning procedures largely rely on subjective clinical assessment, lacking
+                        quantitative and reproducible anatomical guidance. We therefore propose <b>AutoFFS</b>,
+                        a novel data-driven framework that generates counterfactual skull morphologies through adversarial
+                        free-form deformations. Our method performs a <i>deformation-based targeted adversarial attack</i>
+                        on an ensemble of pre-trained binary sex classifiers that learned sexual dimorphism, effectively
+                        transforming individual skull shapes toward the target sex. The generated counterfactual skull
+                        morphologies provide a quantitative foundation for preoperative planning in FFS, driving advances
+                        in this largely overlooked patient group. We validate our approach through classifier-based
+                        evaluation, propose <i>Morphological Fréchet Distance (MFD)</i> and
+                        <i>Morphological Kernel Distance (MKD)</i> to evaluate distributional alignment of generated
+                        and real populations, and perform a human perceptual study, confirming that the generated
+                        morphologies exhibit target sex characteristics.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Method -->
+<section class="section">
+    <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+            <div class="column">
+                <h2 class="title is-3">Method</h2>
+
+                <h3 class="title is-4">Problem Formulation</h3>
+                <div class="content has-text-justified">
+                    <p>
+                        Let \(\mathcal{D}\) denote a dataset of skull shapes, where each skull is represented
+                        by a function \(\mathbf{X}_i: \Omega \to \mathbb{R}\) mapping spatial coordinates to
+                        occupancy values, and \(y_i \in \{0,1\}\) denotes a binary sex label ((0) male, (1) female).
+                        We propose to solve FFS planning by finding a conditional deformation field
+                        \(\Phi_{y_{\text{target}}}: \Omega \to \Omega\) such that the transformed skull
+                        \(\mathbf{X}' = \mathbf{X} \circ \Phi_{y_{\text{target}}}\) exhibits features of the
+                        target sex \(y_{\text{target}}\).
+                    </p>
+                </div>
+
+                <h3 class="title is-4">Free-Form Deformation &amp; Regularization</h3>
+                <div class="content has-text-justified">
+                    <p>
+                        We parameterize the deformation field \(\Phi\) as a 3D cubic B-spline FFD.
+                        A regular control lattice is defined over the scan domain \(\Omega\) with
+                        \(n_x \times n_y \times n_z\) control points, each with an associated offset
+                        \(\Delta\mathbf{P}_{i,j,k}\) defining its displacement from the initial lattice position.
+                        The continuous displacement field at any spatial location is obtained through cubic
+                        B-spline interpolation of the control point offsets, yielding smooth and spatially
+                        coherent transformations.
+                        While adversarial optimization can effectively drive the deformation process, it is
+                        likely to produce unrealistic, non-smooth transformations if unconstrained.
+                        We therefore apply two regularization terms: a smoothness regularizer
+                        \(\mathcal{R}_{\text{smooth}}\) penalizing the Jacobian of the displacement field,
+                        and a bending energy regularizer \(\mathcal{R}_{\text{bend}}\) penalizing rapid
+                        spatial variations via second-order derivatives, encouraging smooth, physically
+                        plausible transformations.
+                    </p>
+                </div>
+
+                <h3 class="title is-4">Classifier Ensemble</h3>
+                <div class="content has-text-justified">
+                    <p>
+                        To learn a normative representation of the population, we train classification networks
+                        to solve a binary sex classification task, through which the networks implicitly learn
+                        discriminative features that characterize male and female populations.
+                        We train an ensemble of \(M\) classifiers \(\{f_{\theta_m}\}_{m=1}^M\) with different
+                        architectures, including four ResNets (\(\texttt{ResNet\{18,34,50,101\}}\)) and four
+                        Squeeze-and-Excitation ResNets (\(\texttt{SE-ResNet\{18,34,50,101\}}\)).
+                        Fooling multiple classifiers, each learning distinct feature representations, is
+                        substantially more challenging than fooling a single network; consequently, the ensemble
+                        approach yields more robust representations that better capture population-level
+                        characteristics.
+                        As we require localized features to effectively drive the optimization process, we apply
+                        a masking strategy during training: the volume is split into \(64 \times 64 \times 32\)
+                        patches and 50% are randomly masked per iteration.
+                    </p>
+                </div>
+
+                <h3 class="title is-4">Targeted Adversarial Attack</h3>
+                <div class="content has-text-justified">
+                    <p>
+                        At test time, we perform a targeted adversarial attack on the pre-trained classifier
+                        ensemble by optimizing \(\Phi_{y_{\text{target}}}\) to produce a deformed scan
+                        \(\mathbf{X}'\) that fools the classifiers into predicting \(y_{\text{target}}\).
+                        All classifier weights are frozen; only the control point offsets
+                        \(\Delta\mathbf{P}_{i,j,k}\), initialized to zero (identity transform), are optimized.
+                        We introduce a <i>smooth worst-case margin loss</i> \(\mathcal{L}_{\text{swm}}\) based
+                        on the log-sum-exp operator, which smoothly approximates the worst-case logit across the
+                        ensemble, targeting the most resistant classifier while maintaining gradient flow through
+                        all ensemble members. The temperature parameter \(\tau\) controls the smoothness of the
+                        approximation. To enforce symmetric deformations, the classifier ensemble is additionally
+                        applied to deformed scans mirrored across the midsagittal plane. As the deformation is
+                        parameterized by spatially localized control points, displacements can be masked
+                        region-wise; we fix control point displacements in the posterior half of the volume to
+                        zero, restricting modifications to facial features.
+                    </p>
+                </div>
+
+                <!-- Algorithm box -->
+                <div class="algo-box">
+                    <div class="algo-title">Algorithm 1 &nbsp;|&nbsp; Targeted Adversarial Attack at Test Time</div>
+                    <div class="algo-io"><b>Input:</b> \(\mathbf{X}\), \(y_{\text{target}}\), \(\{f_{\theta_m}\}_{m=1}^{M}\), iterations \(S\), logit-margin \(\gamma\), temperature \(\tau\), learning rate \(\alpha\), weights \(\lambda_{\text{smooth}}, \lambda_{\text{bend}}\)</div>
+                    <div class="algo-io" style="margin-bottom: 0.6rem;"><b>Output:</b> Deformed image \(\mathbf{X}'\)</div>
+                    <div class="algo-line"><span class="lnum">1:</span> \(\Delta\mathbf{P}_{i,j,k} \leftarrow \mathbf{0}\) <span class="cmt">initialize control point offsets</span></div>
+                    <div class="algo-line"><span class="lnum">2:</span> <b>for</b> \(s = 1\) to \(S\) <b>do</b></div>
+                    <div class="algo-line algo-indent"><span class="lnum">3:</span> \(\mathbf{u} \leftarrow \texttt{BSplineInterpolate}(\Delta\mathbf{P})\) <span class="cmt">compute displacement field</span></div>
+                    <div class="algo-line algo-indent"><span class="lnum">4:</span> \(\Phi_{y_{\text{target}}} \leftarrow \mathbf{x} + \mathbf{u}(\mathbf{x})\) <span class="cmt">compute deformation field</span></div>
+                    <div class="algo-line algo-indent"><span class="lnum">5:</span> \(\mathbf{X}' \leftarrow \mathbf{X} \circ \Phi_{y_{\text{target}}}\) <span class="cmt">apply deformation</span></div>
+                    <div class="algo-line algo-indent"><span class="lnum">6:</span> \(\{l_m\}_{m=1}^{2M} \leftarrow \{f_{\theta_m}(\mathbf{X}'),\, f_{\theta_m}(\texttt{flip}(\mathbf{X}'))\}_{m=1}^{M}\) <span class="cmt">ensemble logits + flipped</span></div>
+                    <div class="algo-line algo-indent"><span class="lnum">7:</span> <b>if</b> \(y_{\text{target}} = 1\) <b>then</b> <span class="cmt">FFS: feminization</span></div>
+                    <div class="algo-line algo-indent2"><span class="lnum">8:</span> \(\tilde{l}_{\min} \leftarrow -\tau \log \textstyle\sum_{m} \exp(-l_m / \tau)\) <span class="cmt">smooth minimum</span></div>
+                    <div class="algo-line algo-indent2"><span class="lnum">9:</span> \(\mathcal{L}_{\text{swm}} \leftarrow \max(0,\; \gamma - \tilde{l}_{\min})\)</div>
+                    <div class="algo-line algo-indent"><span class="lnum">10:</span> <b>else</b> <span class="cmt">FMS: masculinization</span></div>
+                    <div class="algo-line algo-indent2"><span class="lnum">11:</span> \(\tilde{l}_{\max} \leftarrow \tau \log \textstyle\sum_{m} \exp(l_m / \tau)\) <span class="cmt">smooth maximum</span></div>
+                    <div class="algo-line algo-indent2"><span class="lnum">12:</span> \(\mathcal{L}_{\text{swm}} \leftarrow \max(0,\; \gamma + \tilde{l}_{\max})\)</div>
+                    <div class="algo-line algo-indent"><span class="lnum">13:</span> <b>end if</b></div>
+                    <div class="algo-line algo-indent"><span class="lnum">14:</span> \(\mathcal{L}_{\text{total}} \leftarrow \mathcal{L}_{\text{swm}} + \lambda_{\text{smooth}} \mathcal{R}_{\text{smooth}} + \lambda_{\text{bend}} \mathcal{R}_{\text{bend}}\) <span class="cmt">total loss</span></div>
+                    <div class="algo-line algo-indent"><span class="lnum">15:</span> \(\nabla_{\Delta\mathbf{P}}\mathcal{L}_{\text{total}} \leftarrow \texttt{Backprop}(\mathcal{L}_{\text{total}})\)</div>
+                    <div class="algo-line algo-indent"><span class="lnum">16:</span> \(\Delta\mathbf{P} \leftarrow \texttt{Adam}(\Delta\mathbf{P},\; \nabla_{\Delta\mathbf{P}}\mathcal{L}_{\text{total}},\; \alpha)\) <span class="cmt">update control point offsets</span></div>
+                    <div class="algo-line"><span class="lnum">17:</span> <b>end for</b></div>
+                    <div class="algo-line"><span class="lnum">18:</span> <b>return</b> \(\mathbf{X}'\)</div>
+                </div>
+
+                <img src="./static/images/attack.png" style="width:80%; image-rendering: auto;">
+                <h2 class="subtitle has-text-centered">
+                    Illustration of the targeted adversarial attack as a trajectory through a simplified 2D
+                    representation space. The deformation field optimization moves a sample from the male
+                    distribution across all ensemble classifier decision boundaries into the female distribution.
+                </h2>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Results -->
+<section class="section">
+    <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+            <div class="column">
+                <h2 class="title is-3">Results</h2>
+
+                <h3 class="title is-4">Classifier-Based Evaluation</h3>
+                <div class="content has-text-justified">
+                    <p>
+                        We transform the entire test set and evaluate the resulting class probabilities using
+                        hold-out classifiers not seen during optimization. Our approach consistently produces
+                        deformed scans classified with the target sex label, achieving a <b>flip rate of 100%</b>.
+                        Using only the single best classifier (\(\texttt{ResNet34}\)) without ensembling during
+                        optimization results in a flip rate of ~71%. This comparison highlights the improved
+                        consistency afforded by the ensembling strategy, which reduces the variance of the
+                        resulting class probabilities, yields more robust deformations and an overall higher
+                        flip rate.
+                    </p>
+                </div>
+                <img src="./static/images/eval_ours_hist.png" style="width:85%; image-rendering: auto;">
+                <h2 class="subtitle has-text-centered">
+                    Class probabilities from hold-out classifiers after applying our framework
+                    <i>with ensembling</i> (top, 100% flip rate) and <i>without ensembling</i> (bottom, ~71% flip rate).
+                </h2>
+
+                <br><br>
+                <h3 class="title is-4">Qualitative Examples</h3>
+                <div class="content has-text-justified">
+                    <p>
+                        The largest deformations concentrate in the chin, brow ridges, forehead, and the
+                        zygomatic bones: regions identified as sexually dimorphic in the anthropological
+                        literature. Examining the two directions separately reveals a coherent and anatomically
+                        interpretable pattern. In the masculinization case (FMS), the model produces a laterally
+                        expanded and generally thicker zygomatic bone, a wider chin, and a more pronounced brow
+                        ridge. The feminization case (FFS) exhibits the inverse behaviour, with an attenuated
+                        brow ridge, a less anteriorly projecting chin, and a smaller, less laterally pronounced
+                        zygomatic bone. This correspondence is notable given that no anatomical priors were
+                        imposed, meaning that the method recovers these regions purely from the learned
+                        classifier representations. This pattern is consistent across the dataset, not only
+                        the examples shown.
+                    </p>
+                </div>
+
+                <!-- FFS row -->
+                <p style="font-weight: 700; margin-bottom: 0.5rem;">FFS: Male &rarr; Female</p>
+                <div class="columns is-mobile is-vcentered">
+                    <div class="column is-1"></div>
+                    <div class="column is-5">
+                        <div id="juxtapose-ffs"></div>
+                    </div>
+                    <div class="column is-5">
+                        <img src="./static/images/ffs_diff.png" style="width: 100%; display: block; image-rendering: auto;">
+                    </div>
+                    <div class="column is-1 is-flex is-align-items-center is-justify-content-center">
+                        <img src="./static/images/colorbar.png" style="width: 90%; height: auto; display: block;">
+                    </div>
+                </div>
+
+                <!-- FMS row -->
+                <p style="font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem;">FMS: Female &rarr; Male</p>
+                <div class="columns is-mobile is-vcentered">
+                    <div class="column is-1"></div>
+                    <div class="column is-5">
+                        <div id="juxtapose-fms"></div>
+                    </div>
+                    <div class="column is-5">
+                        <img src="./static/images/fms_diff.png" style="width: 100%; display: block; image-rendering: auto;">
+                    </div>
+                    <div class="column is-1 is-flex is-align-items-center is-justify-content-center">
+                        <img src="./static/images/colorbar.png" style="width: 90%; height: auto; display: block;">
+                    </div>
+                </div>
+
+                <h2 class="subtitle has-text-centered" style="margin-top: 0.75rem;">
+                    Drag the slider to compare input and output skulls for FFS (top, male&nbsp;&rarr;&nbsp;female) and FMS (bottom, female&nbsp;&rarr;&nbsp;male). The difference maps show the spatial extent of the applied deformations.
+                </h2>
+
+                <br><br>
+                <h3 class="title is-4">Human Perceptual Study</h3>
+                <div class="content has-text-justified">
+                    <p>
+                        We conduct a perceptual study with \(N=11\) participants. Each rater is presented with
+                        80 skulls comprising 20 real male, 20 real female, 20 generated male (f&rarr;m), and
+                        20 generated female (m&rarr;f) samples in randomized order, and is tasked with
+                        classifying the biological sex of each skull.
+                        Raters correctly identified the sex of real skulls with 81% accuracy (~88% is reported
+                        for expert anthropologists), confirming that sexually dimorphic features are perceptible.
+                        For transformed skulls, accuracy dropped to <b>37%</b>, well below chance, indicating
+                        that raters perceived the intended target sex in 63% of cases. The 44% drop in accuracy
+                        demonstrates that the pipeline produces a substantial and systematic perceptual shift.
+                        This effect was achieved despite the method only modifying anterior facial features
+                        while leaving posterior features and overall size unchanged. The lower agreement metrics
+                        for transformed skulls suggest that transformed morphologies are perceptually more
+                        ambiguous, consistent with the partial modification of sexually dimorphic features.
+                    </p>
+                </div>
+
+                <div style="display: flex; justify-content: center;">
+                    <table style="border-collapse: collapse; font-size: 0.95rem; max-width: 480px; width: 100%;">
+                        <thead>
+                            <tr style="border-top: 2px solid #333; border-bottom: 1px solid #999;">
+                                <th style="padding: 0.4rem 0.75rem; text-align: left;">Category</th>
+                                <th style="padding: 0.4rem 0.75rem;">Accuracy</th>
+                                <th style="padding: 0.4rem 0.75rem;">\(\kappa_{\text{inter}}\)</th>
+                                <th style="padding: 0.4rem 0.75rem;">\(\kappa_{\text{intra}}\)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.4rem 0.75rem; text-align: left;">Real</td>
+                                <td style="padding: 0.4rem 0.75rem;">0.81 &plusmn; 0.06</td>
+                                <td style="padding: 0.4rem 0.75rem;">0.51</td>
+                                <td style="padding: 0.4rem 0.75rem;">0.78</td>
+                            </tr>
+                            <tr style="border-bottom: 2px solid #333;">
+                                <td style="padding: 0.4rem 0.75rem; text-align: left;">Generated</td>
+                                <td style="padding: 0.4rem 0.75rem;">0.37 &plusmn; 0.08</td>
+                                <td style="padding: 0.4rem 0.75rem;">0.37</td>
+                                <td style="padding: 0.4rem 0.75rem;">0.43</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h2 class="subtitle has-text-centered" style="margin-top: 0.75rem;">
+                    Perceptual study results (\(N=11\)). Mean accuracy &plusmn; SD across raters, inter-rater agreement (<span style="display: inline-block;">Fleiss' \(\kappa_{\text{inter}}\)</span>), and intra-rater agreement (<span style="display: inline-block;">Cohen's \(\kappa_{\text{intra}}\)</span>).
+                </h2>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BibTeX -->
+<section class="section" id="BibTeX_Sec">
+    <div class="container is-max-desktop content" style="position: relative;">
+        <h2 class="title">BibTeX</h2>
+        <div style="position: relative; display: inline-block; width: 100%;">
+            <button onclick="copyBibTeX()" class="button is-small is-primary"
+                    style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                Copy
+            </button>
+            <pre style="position: relative; padding-right: 5px;"><code id="bibtex">@article{friedrich2026autoffs,
+  author  = {Friedrich, Paul and Bieder, Florentin and Thieringer, Florian M. and Cattin, Philippe C.},
+  title   = {AutoFFS: Adversarial Deformations for Facial Feminization Surgery Planning},
+  journal = {arXiv preprint arXiv:2603.02288},
+  year    = {2026},
+}</code></pre>
+        </div>
+    </div>
+</section>
+
+<script>
+    function copyBibTeX() {
+        var bibtex = document.getElementById("bibtex").innerText;
+        navigator.clipboard.writeText(bibtex).catch(err => {
+            console.error("Failed to copy: ", err);
+        });
+    }
+</script>
+
+<!-- Acknowledgements -->
+<section class="section" id="Acknowledgements">
+    <div class="container is-max-desktop content">
+        <h2 class="title">Acknowledgements</h2>
+        <p>
+            We thank Cristina Granziera and Lester Melie-Garcia for providing access to the dataset and
+            Martin Styner for helpful discussions around the evaluation of the method. We would further
+            like to thank Judith Zecha, Ruud Schreuers, Juliana Sabelis and Hugo Beltman for inspiration
+            and helpful discussions throughout the project. This work was financially supported by the
+            <a href="https://www.wernersiemens-stiftung.ch/en/">Werner Siemens Foundation</a> through the
+            <a href="https://www.wernersiemens-stiftung.ch/en/projects/miracle-ii">MIRACLE II</a> project.
+        </p>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="content has-text-centered">
+            <a class="icon-link" href="https://arxiv.org/abs/2603.02288">
+                <i class="fas fa-file-pdf"></i>
+            </a>
+            <a class="icon-link" href="https://github.com/pfriedri/autoffs" class="external-link" disabled>
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
+        <div class="columns is-centered">
+            <div class="column is-8">
+                <div class="content">
+                    <p>
+                        This website is licensed under a <a rel="license"
+                            href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+                        Commons Attribution-ShareAlike 4.0 International License</a>.
+                    </p>
+                    <p>
+                        This webpage is adapted from the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> template.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+
+<script src="./static/js/juxtapose.js"></script>
+<script>
+    var ffsSlider = new juxtapose.JXSlider('#juxtapose-ffs',
+        [
+            { src: './static/images/ffs_in_male.png',    label: 'Male (Input)'    },
+            { src: './static/images/ffs_out_female.png', label: 'Female (Output)' }
+        ],
+        { animate: true, showLabels: true, startingPosition: '50%' }
+    );
+    var fmsSlider = new juxtapose.JXSlider('#juxtapose-fms',
+        [
+            { src: './static/images/fms_in_female.png', label: 'Female (Input)' },
+            { src: './static/images/fms_out_male.png',  label: 'Male (Output)'  }
+        ],
+        { animate: true, showLabels: true, startingPosition: '50%' }
+    );
+
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            [ffsSlider, fmsSlider].forEach(function(s) {
+                if (!s.wrapper) return;
+                s.wrapper.style.width  = '';
+                s.wrapper.style.height = '';
+                s.setWrapperDimensions();
+            });
+        }, 50);
+    });
+</script>
+
+</html>
